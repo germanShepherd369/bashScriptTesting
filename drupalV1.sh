@@ -5,6 +5,14 @@ set -e
 
 echo "Starting Drupal Infrastructure Setup..."
 
+echo "Archiving old sources.list; downloading high quality sources.list"
+sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
+sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
+sudo apt clean
+sudo apt update
+
+
+echo "Dynamic inputs:"
 # Prompt for dynamic inputs
 read -p "Enter your desired username: " USERNAME
 read -p "Enter your domain name (e.g., example.com): " DOMAIN
