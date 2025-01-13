@@ -52,10 +52,8 @@ deb http://security.ubuntu.com/ubuntu noble-security main restricted universe mu
 ## newer versions of some applications which may provide useful features.
 ## Also, please note that software in backports WILL NOT receive any review
 ## or updates from the Ubuntu security team.
-# deb http://azure.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multi
-verse
-# deb-src http://azure.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe m
-ultiverse
+# deb http://azure.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse
+# deb-src http://azure.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse
 
 ## Uncomment the following two lines to add software from Canonical's
 ## 'partner' repository.
