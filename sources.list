@@ -19,5 +19,9 @@ deb http://archive.canonical.com/ubuntu focal partner
 deb-src http://archive.canonical.com/ubuntu focal partner
 
 # Cloud Archive for cloud tools (optional for Azure instances)
-deb http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/ussuri main
-deb-src http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/ussuri main
+#deb http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/ussuri main
+#deb-src http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/ussuri main
+
+# Cloud Archive for newer OpenStack releases
+deb http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/victoria main
+deb-src http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/victoria main
