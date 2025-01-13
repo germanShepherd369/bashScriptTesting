@@ -19,7 +19,30 @@ sudo apt-add-repository restricted
 sudo apt-add-repository universe
 sudo apt-add-repository multiverse
 
+sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
+sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
+sudo wget -O /etc/apt/sources.list.d/ubuntu.sources https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/ubuntu.sources.txt
+sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
+cat /etc/apt/sources.list.d/ubuntu.sources
+
+
+
 sudo apt clean
+sudo apt update
+sudo apt --fix-broken install
+sudo dpkg --configure -a
+sudo apt update
+#sudo apt install libavif16 libfontconfig1 libheif1 libimagequant0 libjpeg8 libraqm0 libtiff6 libwebp7 libxpm4
+sudo apt install libavif16
+sudo apt install libfontconfig1
+sudo apt install libheif1
+sudo apt install libimagequant0
+sudo apt install libjpeg8
+sudo apt install libraqm0
+sudo apt install libtiff6
+sudo apt install libwebp7
+sudo apt install libxpm4
+
 sudo apt update
 
 
@@ -84,7 +107,39 @@ echo "Installing PHP $PHP_VERSION and required extensions..."
 sudo apt install -y software-properties-common
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
-sudo apt install -y php${PHP_VERSION} php-cli php-curl php-gd php-mbstring php-xml php-mysql php-zip php-opcache php-intl
+#sudo apt install -y php${PHP_VERSION} php-cli php-curl php-gd php-mbstring php-xml php-mysql php-zip php-opcache php-intl
+# Install PHP 8.4 core
+sudo apt install -y php8.4
+
+# Install PHP CLI (Command-Line Interface)
+sudo apt install -y php8.4-cli
+
+# Install cURL extension
+sudo apt install -y php8.4-curl
+
+# Install GD library for image processing
+sudo apt install -y php8.4-gd
+
+# Install Mbstring extension for multibyte string handling
+sudo apt install -y php8.4-mbstring
+
+# Install XML extension
+sudo apt install -y php8.4-xml
+
+# Install MySQL extension for database interaction
+sudo apt install -y php8.4-mysql
+
+# Install ZIP extension for file compression and extraction
+sudo apt install -y php8.4-zip
+
+# Install OPCache for PHP performance improvement
+sudo apt install -y php8.4-opcache
+
+# Install Intl extension for internationalization
+sudo apt install -y php8.4-intl
+
+
+
 
 # Install MariaDB
 echo "Installing MariaDB $MARIADB_VERSION..."
