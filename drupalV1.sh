@@ -1,25 +1,47 @@
 #!/bin/bash
 
-# Exit on error
-set -e
+# Exit on error and log all commands
+set -euo pipefail
+trap 'echo "Error on line $LINENO"; exit 1' ERR
+
+LOG_FILE="/var/log/drupal_setup.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting Drupal Infrastructure Setup..."
 
-echo "Archiving old sources.list; downloading high quality sources.list"
+# Archive old sources.list and fetch new high-quality sources
+echo "Archiving and updating sources.list..."
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
 sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
 sudo apt clean
 sudo apt update
 
+# Dynamic inputs with defaults
+DEFAULT_USERNAME="drupaladmin"
+DEFAULT_DOMAIN="example.com"
+DEFAULT_DB_ROOT_PASS="rootpassword"
+DEFAULT_DB_NAME="drupaldb"
+DEFAULT_DB_USER="drupaluser"
+DEFAULT_DB_PASS="drupalpass"
 
-echo "Dynamic inputs:"
-# Prompt for dynamic inputs
-read -p "Enter your desired username: " USERNAME
-read -p "Enter your domain name (e.g., example.com): " DOMAIN
-read -p "Enter your database root password: " DB_ROOT_PASS
-read -p "Enter your database name for Drupal: " DB_NAME
-read -p "Enter your Drupal database user: " DB_USER
-read -p "Enter your Drupal database user password: " DB_PASS
+echo "Dynamic inputs (press Enter to use default values):"
+read -p "Enter your desired username [${DEFAULT_USERNAME}]: " USERNAME
+USERNAME=${USERNAME:-$DEFAULT_USERNAME}
+
+read -p "Enter your domain name [${DEFAULT_DOMAIN}]: " DOMAIN
+DOMAIN=${DOMAIN:-$DEFAULT_DOMAIN}
+
+read -p "Enter your database root password [${DEFAULT_DB_ROOT_PASS}]: " DB_ROOT_PASS
+DB_ROOT_PASS=${DB_ROOT_PASS:-$DEFAULT_DB_ROOT_PASS}
+
+read -p "Enter your database name for Drupal [${DEFAULT_DB_NAME}]: " DB_NAME
+DB_NAME=${DB_NAME:-$DEFAULT_DB_NAME}
+
+read -p "Enter your Drupal database user [${DEFAULT_DB_USER}]: " DB_USER
+DB_USER=${DB_USER:-$DEFAULT_DB_USER}
+
+read -p "Enter your Drupal database user password [${DEFAULT_DB_PASS}]: " DB_PASS
+DB_PASS=${DB_PASS:-$DEFAULT_DB_PASS}
 
 # Variables
 PHP_VERSION="8.4"
@@ -30,14 +52,18 @@ MARIADB_VERSION="11.6.2"
 APACHE_VERSION="2.4.62"
 DRUPAL_VERSION="11"
 
-# Update and upgrade the system
+# Update and upgrade system
 echo "Updating and upgrading the system..."
 sudo apt update && sudo apt upgrade -y
 
 # Create new user
-echo "Creating user: $USERNAME"
-sudo adduser --gecos "" $USERNAME
-sudo usermod -aG sudo $USERNAME
+if id "$USERNAME" &>/dev/null; then
+    echo "User $USERNAME already exists. Skipping creation."
+else
+    echo "Creating user: $USERNAME"
+    sudo adduser --gecos "" $USERNAME
+    sudo usermod -aG sudo $USERNAME
+fi
 
 # Install Apache
 echo "Installing Apache $APACHE_VERSION..."
@@ -71,6 +97,7 @@ y
 y
 EOF
 
+echo "Creating database and user..."
 sudo mysql -u root -p"$DB_ROOT_PASS" <<EOF
 CREATE DATABASE $DB_NAME;
 CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
@@ -93,11 +120,17 @@ echo "Installing Composer..."
 sudo apt install -y composer
 echo "Installing Drush $DRUSH_VERSION..."
 composer global require drush/drush:"$DRUSH_VERSION"
+composer global require drush/drush-plugin-manager
 echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 
 # Verify Drush installation
-drush --version
+if drush --version; then
+    echo "Drush successfully installed."
+else
+    echo "Drush installation failed. Check logs for details."
+    exit 1
+fi
 
 # Install Certbot for SSL
 echo "Installing Certbot for SSL..."
@@ -154,3 +187,8 @@ echo "MariaDB credentials:"
 echo "Database: $DB_NAME"
 echo "Username: $DB_USER"
 echo "Password: $DB_PASS"
+
+# Debugging best practices
+echo "For debugging, review the log file at: $LOG_FILE"
+echo "Use 'journalctl -xe' to check for service errors if something doesn't work."
+echo "Use 'drush status' for Drupal status and configuration checks."
