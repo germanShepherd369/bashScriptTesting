@@ -13,8 +13,16 @@ echo "Starting Drupal Infrastructure Setup..."
 echo "Archiving and updating sources.list..."
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
 sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
+
+sudo apt-add-repository main
+sudo apt-add-repository restricted
+sudo apt-add-repository universe
+sudo apt-add-repository multiverse
+
 sudo apt clean
 sudo apt update
+
+
 
 # Dynamic inputs with defaults
 DEFAULT_USERNAME="drupaladmin"
@@ -98,7 +106,7 @@ y
 EOF
 
 echo "Creating database and user..."
-sudo mysql -u root -p"$DB_ROOT_PASS" <<EOF
+sudo sudo mysql -u root -p"$DB_ROOT_PASS" <<EOF
 CREATE DATABASE $DB_NAME;
 CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
 GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';
@@ -135,7 +143,7 @@ fi
 # Install Certbot for SSL
 echo "Installing Certbot for SSL..."
 sudo apt install -y certbot python3-certbot-apache
-sudo certbot --apache -d $DOMAIN
+##sudo certbot --apache -d $DOMAIN
 
 # Install Ansible
 echo "Installing Ansible..."
@@ -192,3 +200,4 @@ echo "Password: $DB_PASS"
 echo "For debugging, review the log file at: $LOG_FILE"
 echo "Use 'journalctl -xe' to check for service errors if something doesn't work."
 echo "Use 'drush status' for Drupal status and configuration checks."
+
