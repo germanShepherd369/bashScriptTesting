@@ -149,7 +149,7 @@ sudo composer require --dev drush/drush || echo "Drush installation failed"
 if ! grep -q 'export PATH="$HOME/.composer/vendor/bin:$PATH"' ~/.bashrc; then
     echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 fi
-source ~/.bash_profile
+source ~/.bashrc
 
 
 wget https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/composer.json -O composer.json
