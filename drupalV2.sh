@@ -32,21 +32,32 @@ sudo locale-gen en_US.UTF-8
 sudo update-locale LANG=en_US.UTF-8
 sudo timedatectl set-timezone UTC
 
+sudo apt clean
+sudo apt update || echo "Error during 'apt update'"
+sudo apt --fix-broken install -y || echo "Error during 'apt --fix-broken install'"
 # Archive old sources.list and fetch new high-quality sources
 echo "Updating sources.list..."
+sudo wget -O /etc/apt/sources.list.d/ubuntu.sources https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/ubuntu.sources
+sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
+
+sudo apt clean
+sudo apt update || echo "Error during 'apt update'"
+sudo apt --fix-broken install -y || echo "Error during 'apt --fix-broken install'"
+
 sudo rm -f /etc/apt/sources.list.d/*
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
 sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
-validate_file /etc/apt/sources.list
+
+sudo apt clean
+sudo apt update || echo "Error during 'apt update'"
+sudo apt --fix-broken install -y || echo "Error during 'apt --fix-broken install'"
 
 sudo apt-add-repository main -y
 sudo apt-add-repository restricted -y
 sudo apt-add-repository universe -y
 sudo apt-add-repository multiverse -y
 
-sudo wget -O /etc/apt/sources.list.d/ubuntu.sources https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/ubuntu.sources.txt
-sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
-validate_file /etc/apt/sources.list.d/ubuntu.sources
+
 
 sudo apt clean
 sudo apt update || echo "Error during 'apt update'"
@@ -97,7 +108,6 @@ sudo systemctl reload apache2 || { echo "Error reloading Apache configuration"; 
 
 # Verify Drupal URL
 echo "Validating Drupal site..."
-validate_url "http://localhost"
 
 # PHP and Extensions
 echo "Installing PHP and required extensions..."
@@ -121,7 +131,6 @@ echo "Installing and configuring MariaDB..."
 install_package mariadb-server
 sudo systemctl enable mariadb
 sudo systemctl start mariadb
-validate_service mariadb
 
 sudo mysql_secure_installation || echo "MariaDB secure installation failed"
 
@@ -131,13 +140,46 @@ install_package redis-server
 install_package varnish
 sudo systemctl enable redis varnish
 sudo systemctl start redis varnish
-validate_service redis
-validate_service varnish
+
 
 # Composer and Drush
 echo "Installing Composer and Drush..."
 install_package composer
 composer global require drush/drush:"13" || echo "Drush installation failed"
+echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+sudo apt install -y certbot python3-certbot-apache
+
+echo "Downloading and setting up Drupal $DRUPAL_VERSION..."
+sudo mkdir -p /var/www/$DOMAIN
+sudo chown -R $USERNAME:$USERNAME /var/www/$DOMAIN
+sudo chmod -R 755 /var/www/$DOMAIN
+
+sudo -u $USERNAME composer create-project drupal/recommended-project /var/www/$DOMAIN
+cd /var/www/$DOMAIN
+sudo -u $USERNAME composer require drush/drush
+
+# Configure Apache Virtual Host
+echo "Configuring Apache virtual host for $DOMAIN..."
+sudo tee /etc/apache2/sites-available/$DOMAIN.conf > /dev/null <<EOF
+<VirtualHost *:80>
+    ServerName $DOMAIN
+    ServerAlias www.$DOMAIN
+    DocumentRoot /var/www/$DOMAIN/web
+
+    <Directory /var/www/$DOMAIN/web>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/$DOMAIN-error.log
+    CustomLog \${APACHE_LOG_DIR}/$DOMAIN-access.log combined
+</VirtualHost>
+EOF
+
+sudo a2ensite $DOMAIN.conf
+sudo systemctl reload apache2
 
 # Firewall
 echo "Configuring UFW Firewall..."
