@@ -31,18 +31,34 @@ APACHE_VERSION="2.4.62"
 DRUPAL_VERSION="11"
 
 
+update_sources_list() {
+    echo "========================================"
+    echo "Updating sources.list and preparing system..."
+    echo "========================================"
 
-echo "Updating sources.list..."
-sudo wget -O /etc/apt/sources.list.d/ubuntu.sources https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/ubuntu.sources
-sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
+    # Update Ubuntu sources list
+    echo "Fetching custom sources.list.d configuration..."
+    sudo wget -O /etc/apt/sources.list.d/ubuntu.sources https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/ubuntu.sources
+    sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
 
+    # Backup and replace main sources.list
+    echo "Backing up and replacing sources.list..."
+    sudo rm -f /etc/apt/sources.list.d/*
+    sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
+    sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
 
-sudo rm -f /etc/apt/sources.list.d/*
-sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
-sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
-sudo apt install software-properties-common -y
-sudo add-apt-repository ppa:ondrej/php -y
-sudo apt update
+    # Add PHP repository
+    echo "Installing required tools and adding PPA for PHP..."
+    sudo apt install software-properties-common -y
+    sudo add-apt-repository ppa:ondrej/php -y
+
+    # Update package index
+    echo "Updating package index..."
+    sudo apt update
+    echo "========================================"
+    echo "Sources list updated successfully!"
+    echo "========================================"
+}
 
 # Helper Functions
 validate_command() {
@@ -175,6 +191,7 @@ configure_firewall() {
 
 main() {
     echo "Starting main setup sequence..."
+	update_sources_list
     configure_locale_and_timezone
     update_and_prepare_system
     install_required_packages
@@ -191,4 +208,4 @@ main() {
 main
 
 
-## V123 test
+## FinalCunt
