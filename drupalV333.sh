@@ -192,8 +192,22 @@ replace_composer_json() {
 	sudo sed -i '/"minimum-stability":/c\    "minimum-stability": "dev",' $DRUPAL_DIR/composer.json
 	echo "composer.json updated successfully!"
 }
+db_permissions() {
+	echo "Creating database and user..."
+	sudo mysql -u root -p -e "CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+	sudo mysql -u root -p -e "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}'; \
+	GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost'; \
+	FLUSH PRIVILEGES;"
 
-
+	echo "Database ${DB_NAME} and user ${DB_USER} created successfully!"
+}
+mainT() {
+    echo "Starting main setup sequence..."
+	db_permissions
+	
+    echo "Drupal installation and setup completed successfully!"
+    echo "Log file: $LOG_FILE"
+}
 
 main() {
     echo "Starting main setup sequence..."
@@ -206,13 +220,14 @@ main() {
     finalize_permissions
     configure_firewall
 	replace_composer_json
+	db_permissions
 	
     echo "Drupal installation and setup completed successfully!"
     echo "Log file: $LOG_FILE"
 }
 
 # Execute main function
-main
+mainT
 
 
 ## FinalCunt
