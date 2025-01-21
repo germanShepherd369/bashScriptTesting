@@ -144,9 +144,13 @@ sudo systemctl start redis varnish
 # Composer and Drush
 echo "Installing Composer and Drush..."
 install_package composer
-sudo composer global require drush/drush:"13" || echo "Drush installation failed"
-echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+sudo composer require --dev drush/drush || echo "Drush installation failed"
+# Add Composer's global bin directory to PATH if not already present
+if ! grep -q 'export PATH="$HOME/.composer/vendor/bin:$PATH"' ~/.bashrc; then
+    echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
+fi
+source ~/.bash_profile
+
 
 wget https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/composer.json -O composer.json
 chmod +x composer.json
@@ -162,7 +166,8 @@ sudo chmod -R 755 /var/www/$DOMAIN
 sudo -u $USERNAME composer create-project drupal/recommended-project /var/www/$DOMAIN
 cd /var/www/$DOMAIN
 sudo -u $USERNAME composer require drush/drush
-
+composer require drupal/core --with-all-dependencies
+composer update --with-all-dependencies
 
 sudo a2ensite $DOMAIN.conf
 sudo systemctl reload apache2
@@ -174,6 +179,104 @@ sudo ufw allow 'Apache Full'
 sudo ufw allow 6379  # Redis
 sudo ufw allow 6081  # Varnish
 sudo ufw --force enable
+
+
+composer clear-cache
+#!/bin/bash
+
+# Exit on error and log all commands
+set -euo pipefail
+trap 'echo "Error on line $LINENO"; exit 1' ERR
+
+LOG_FILE="/var/log/drupal_install_debug.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "Starting Drupal Installation Setup..."
+
+# Define variables
+DB_NAME="drupal"
+DB_USER="drupaluser"
+DB_PASS="securepassword"
+SITE_NAME="My Drupal Site"
+ADMIN_USER="admin"
+ADMIN_PASS="adminpassword"
+ADMIN_EMAIL="admin@example.com"
+DOMAIN="ropim.local"
+DRUPAL_DIR="/var/www/ropim"
+
+# Create the database
+echo "Setting up the database..."
+mysql -u root -p <<EOF
+CREATE DATABASE $DB_NAME;
+CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
+GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+EOF
+
+# Create and set permissions for the Drupal directory
+echo "Setting up the directory: $DRUPAL_DIR..."
+sudo mkdir -p $DRUPAL_DIR
+sudo chown -R www-data:www-data $DRUPAL_DIR
+sudo chmod -R 755 $DRUPAL_DIR
+
+# Navigate to the directory and install Drupal
+cd $DRUPAL_DIR
+
+echo "Downloading Drupal project..."
+sudo -u www-data composer create-project drupal/recommended-project .
+
+# Install required dependencies
+echo "Installing Drush..."
+sudo -u www-data composer require drush/drush
+
+# Run the Drupal installation
+echo "Running Drupal installation..."
+sudo -u www-data ./vendor/bin/drush site:install \
+  --db-url=mysql://$DB_USER:$DB_PASS@localhost/$DB_NAME \
+  --site-name="$SITE_NAME" \
+  --account-name="$ADMIN_USER" \
+  --account-pass="$ADMIN_PASS" \
+  --account-mail="$ADMIN_EMAIL"
+
+# Configure Apache Virtual Host
+echo "Configuring Apache for $DOMAIN..."
+sudo tee /etc/apache2/sites-available/$DOMAIN.conf > /dev/null <<EOF
+<VirtualHost *:80>
+    ServerName $DOMAIN
+    DocumentRoot $DRUPAL_DIR/web
+
+    <Directory $DRUPAL_DIR/web>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/$DOMAIN-error.log
+    CustomLog \${APACHE_LOG_DIR}/$DOMAIN-access.log combined
+</VirtualHost>
+EOF
+
+sudo a2ensite $DOMAIN.conf
+sudo systemctl reload apache2
+
+# Set secure permissions for settings.php
+echo "Securing settings.php..."
+sudo chmod 440 $DRUPAL_DIR/web/sites/default/settings.php
+
+# Final steps
+sudo -u www-data ./vendor/bin/drush cache-rebuild
+
+# Firewall setup
+echo "Configuring the firewall..."
+sudo ufw allow OpenSSH
+sudo ufw allow 'Apache Full'
+sudo ufw --force enable
+
+echo "Drupal installation and setup completed successfully!"
+echo "Log file: $LOG_FILE"
+
+
+
 
 # Final Validation
 echo "Setup completed successfully!"
