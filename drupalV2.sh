@@ -138,16 +138,19 @@ sudo mysql_secure_installation || echo "MariaDB secure installation failed"
 echo "Installing Redis and Varnish..."
 install_package redis-server
 install_package varnish
-sudo systemctl enable redis varnish
 sudo systemctl start redis varnish
 
 
 # Composer and Drush
 echo "Installing Composer and Drush..."
 install_package composer
-composer global require drush/drush:"13" || echo "Drush installation failed"
+sudo composer global require drush/drush:"13" || echo "Drush installation failed"
 echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
+
+wget https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/composer.json -O composer.json
+chmod +x composer.json
+
 
 sudo apt install -y certbot python3-certbot-apache
 
@@ -160,23 +163,6 @@ sudo -u $USERNAME composer create-project drupal/recommended-project /var/www/$D
 cd /var/www/$DOMAIN
 sudo -u $USERNAME composer require drush/drush
 
-# Configure Apache Virtual Host
-echo "Configuring Apache virtual host for $DOMAIN..."
-sudo tee /etc/apache2/sites-available/$DOMAIN.conf > /dev/null <<EOF
-<VirtualHost *:80>
-    ServerName $DOMAIN
-    ServerAlias www.$DOMAIN
-    DocumentRoot /var/www/$DOMAIN/web
-
-    <Directory /var/www/$DOMAIN/web>
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog \${APACHE_LOG_DIR}/$DOMAIN-error.log
-    CustomLog \${APACHE_LOG_DIR}/$DOMAIN-access.log combined
-</VirtualHost>
-EOF
 
 sudo a2ensite $DOMAIN.conf
 sudo systemctl reload apache2
