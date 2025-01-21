@@ -1,4 +1,4 @@
-sudo tee /etc/apt/sources.list <<EOF
+
 # Main Ubuntu Repositories
 deb http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu noble-updates main restricted universe multiverse
@@ -18,4 +18,4 @@ deb http://ports.ubuntu.com/ubuntu-ports noble-proposed main restricted universe
 # Third-party PPAs - Uncomment if needed
 # Example: PHP PPA by Ondřej Surý
 deb https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main
-EOF
+
