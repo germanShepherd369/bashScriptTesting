@@ -104,12 +104,11 @@ EOF
 
 configure_database() {
     echo "Configuring MariaDB database..."
-    mysql -u root -p <<EOF
+    mysql -u root -p <<EOF || echo "Failed to configure the database"
 CREATE DATABASE IF NOT EXISTS $DB_NAME;
 CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
 GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';
 FLUSH PRIVILEGES;
-EXIT;
 EOF
 }
 
