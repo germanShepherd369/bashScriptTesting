@@ -201,13 +201,7 @@ db_permissions() {
 
 	echo "Database ${DB_NAME} and user ${DB_USER} created successfully!"
 }
-mainT() {
-    echo "Starting main setup sequence..."
-	db_permissions
-	
-    echo "Drupal installation and setup completed successfully!"
-    echo "Log file: $LOG_FILE"
-}
+
 
 main() {
     echo "Starting main setup sequence..."
@@ -227,7 +221,7 @@ main() {
 }
 
 # Execute main function
-mainT
+main
 
 
 ## FinalCunt
