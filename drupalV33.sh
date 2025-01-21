@@ -154,7 +154,6 @@ main() {
     update_and_prepare_system
     install_required_packages
     configure_apache
-    configure_database
     install_drupal
     finalize_permissions
     configure_firewall
