@@ -30,6 +30,21 @@ MARIADB_VERSION="11.6.2"
 APACHE_VERSION="2.4.62"
 DRUPAL_VERSION="11"
 
+
+
+echo "Updating sources.list..."
+sudo wget -O /etc/apt/sources.list.d/ubuntu.sources https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/ubuntu.sources
+sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
+
+sudo apt clean
+sudo apt update || echo "Error during 'apt update'"
+sudo apt --fix-broken install -y || echo "Error during 'apt --fix-broken install'"
+
+sudo rm -f /etc/apt/sources.list.d/*
+sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
+sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
+
+
 # Helper Functions
 validate_command() {
     echo "Validating command: $1"
