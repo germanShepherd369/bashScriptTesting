@@ -34,6 +34,7 @@ sudo timedatectl set-timezone UTC
 
 # Archive old sources.list and fetch new high-quality sources
 echo "Updating sources.list..."
+sudo rm -f /etc/apt/sources.list.d/*
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
 sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
 validate_file /etc/apt/sources.list
