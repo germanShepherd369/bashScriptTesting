@@ -40,7 +40,9 @@ sudo chmod 644 /etc/apt/sources.list.d/ubuntu.sources
 sudo rm -f /etc/apt/sources.list.d/*
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
 sudo wget -O /etc/apt/sources.list https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/sources.list
-
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt update
 
 # Helper Functions
 validate_command() {
