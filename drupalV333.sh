@@ -108,6 +108,13 @@ EOF
 
 install_drupal() {
     echo "Setting up Drupal..."
+
+    if [ -d "$DRUPAL_DIR" ] && [ "$(ls -A $DRUPAL_DIR)" ]; then
+        echo "Directory $DRUPAL_DIR is not empty. Backing up existing contents."
+        sudo mv "$DRUPAL_DIR" "${DRUPAL_DIR}_backup_$(date +%Y%m%d%H%M%S)"
+        sudo mkdir -p $DRUPAL_DIR
+    fi
+
     sudo mkdir -p $DRUPAL_DIR
     sudo chown -R www-data:www-data $DRUPAL_DIR
     sudo chmod -R 755 $DRUPAL_DIR
@@ -132,6 +139,7 @@ install_drupal() {
       --account-pass="$ADMIN_PASS" \
       --account-mail="$ADMIN_EMAIL" || echo "Drupal installation failed"
 }
+
 
 finalize_permissions() {
     echo "Setting secure permissions for settings.php..."
