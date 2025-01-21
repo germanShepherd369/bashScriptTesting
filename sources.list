@@ -1,3 +1,3 @@
-deb http://archive.ubuntu.com/ubuntu mantic main universe
-deb http://archive.ubuntu.com/ubuntu mantic-updates main universe
-deb http://security.ubuntu.com/ubuntu mantic-security main universe
+deb http://archive.ubuntu.com/ubuntu noble main universe
+deb http://archive.ubuntu.com/ubuntu noble-updates main universe
+deb http://security.ubuntu.com/ubuntu noble-security main universe
