@@ -2,3 +2,6 @@ deb http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu noble-updates main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu noble-security main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu noble-backports main restricted universe multiverse
+
+# Optional: Uncomment if you want to enable the "proposed" repository (not recommended for production)
+deb http://archive.ubuntu.com/ubuntu noble-proposed main restricted universe multiverse
