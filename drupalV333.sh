@@ -9,6 +9,9 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting Drupal Installation and Setup..."
 
+# Ask for IP address
+read -p "Enter the server IP address: " SERVER_IP
+
 # Constants and Variables
 DB_NAME="db"
 DB_USER="admin"
@@ -84,7 +87,7 @@ configure_apache() {
     sudo a2enmod rewrite ssl headers expires
     sudo tee /etc/apache2/sites-available/$DOMAIN.conf > /dev/null <<EOF
 <VirtualHost *:80>
-    ServerName $DOMAIN
+    ServerName $SERVER_IP
     DocumentRoot $DRUPAL_DIR/web
 
     <Directory $DRUPAL_DIR/web>
@@ -92,16 +95,16 @@ configure_apache() {
         Require all granted
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/$DOMAIN-error.log
-    CustomLog \${APACHE_LOG_DIR}/$DOMAIN-access.log combined
+    ErrorLog \${APACHE_LOG_DIR}/ropim-error.log
+    CustomLog \${APACHE_LOG_DIR}/ropim-access.log combined
 </VirtualHost>
 EOF
 
+    sudo a2dissite 000-default.conf
     sudo a2ensite $DOMAIN.conf
     sudo systemctl reload apache2 || echo "Failed to reload Apache"
     validate_service apache2
 }
-
 
 install_drupal() {
     echo "Setting up Drupal..."
@@ -166,4 +169,4 @@ main() {
 main
 
 
-#TT01
+## V123 test
