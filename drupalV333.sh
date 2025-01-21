@@ -188,6 +188,16 @@ configure_firewall() {
         echo "Failed to configure the firewall"
     fi
 }
+replace_composer_json() {
+    echo "Replacing composer.json file..."
+    local composer_url="https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/composer.json"
+    cd $DRUPAL_DIR || { echo "Error: Directory $DRUPAL_DIR does not exist."; exit 1; }
+    sudo wget -O composer.json "$composer_url"
+    sudo chmod +x composer.json
+    echo "composer.json replaced successfully!"
+}
+
+
 
 main() {
     echo "Starting main setup sequence..."
@@ -199,7 +209,8 @@ main() {
     install_drupal
     finalize_permissions
     configure_firewall
-
+	replace_composer_json
+	
     echo "Drupal installation and setup completed successfully!"
     echo "Log file: $LOG_FILE"
 }
