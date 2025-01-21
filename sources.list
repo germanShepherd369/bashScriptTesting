@@ -1,21 +1,4 @@
-
-# Main Ubuntu Repositories
 deb http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu noble-updates main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu noble-security main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu noble-backports main restricted universe multiverse
-
-# Ports Repositories (for ARM or alternative architectures)
-deb http://ports.ubuntu.com/ubuntu-ports noble main restricted universe multiverse
-deb http://ports.ubuntu.com/ubuntu-ports noble-updates main restricted universe multiverse
-deb http://ports.ubuntu.com/ubuntu-ports noble-security main restricted universe multiverse
-deb http://ports.ubuntu.com/ubuntu-ports noble-backports main restricted universe multiverse
-
-# Proposed (Experimental) - Uncomment if you need bleeding-edge packages
-deb http://archive.ubuntu.com/ubuntu noble-proposed main restricted universe multiverse
-deb http://ports.ubuntu.com/ubuntu-ports noble-proposed main restricted universe multiverse
-
-# Third-party PPAs - Uncomment if needed
-# Example: PHP PPA by Ondřej Surý
-deb https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main
-
