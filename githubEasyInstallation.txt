@@ -1,0 +1,3 @@
+wget https://raw.githubusercontent.com/germanShepherd369/bashScriptTesting/main/drupalFinal.sh -O drupalFinal.sh
+chmod +x drupalFinal.sh
+sudo ./drupalFinal.sh
