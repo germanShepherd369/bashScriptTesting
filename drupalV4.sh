@@ -43,7 +43,7 @@ validate_service() {
         exit 1
     fi
 }
-
+....
 # Configuration Functions
 configure_locale_and_timezone() {
     echo "Configuring locale and timezone..."
