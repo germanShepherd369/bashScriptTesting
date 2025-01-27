@@ -1,0 +1,101 @@
+Jádro ROPIM
+
+@startuml
+actor "Správce systému" as Spravce
+actor "Uživatel" as Uzivatel
+actor "Modul" as Modul
+
+usecase "Správa uživatelských účtů" as UC1
+usecase "Přístup k modulům" as UC2
+usecase "Výkon a spolehlivost" as UC3
+usecase "Integrace modulů" as UC4
+usecase "Generování reportů" as UC5
+
+Spravce --> UC1
+Uzivatel --> UC2
+Uzivatel --> UC5
+Modul --> UC4
+UC3 <--> UC4
+@enduml
+
+type:
+"activity"
+code:
+"@startuml\nstart\n:Uživatel otevře přihlašovací stránku platformy;\n:Zadá přihlašovací údaje;\n:Ověření přihlašovacích údajů (SSO autentizace);\nif (Údaje správné?) then (Ano)\n :Načíst uživatelský profil;\n :Zobrazit dostupné moduly;\n :Uživatel vybere modul;\n :Ověřit oprávnění k modulu;\n if (Oprávnění validní?) then (Ano)\n :Přístup k funkcím modulu;\n else (Ne)\n :Zobrazit upozornění o nedostatečných oprávněních;\n endif\nelse (Ne)\n :Zobrazit chybovou zprávu;\nendif\nstop\n@enduml"
+
+type:
+"sequence"
+code:
+"@startuml\nactor Uživatel\nparticipant \"Jádro systému\" as Jadro\nparticipant \"Modul Plánování\" as Modul\nparticipant \"Databáze\" as Databaze\n\nUživatel -> Jadro: Odešle požadavek na data z modulu\nJadro -> Modul: Ověření uživatelských oprávnění\nModul -> Databaze: Načtení dat z databáze\nDatabaze -> Modul: Vrácení požadovaných dat\nModul -> Jadro: Zpracovaná data\nJadro -> Uživatel: Zobrazení dat uživateli\n@enduml"
+
+type:
+"class"
+code:
+"@startuml\nclass \"Uživatel\" {\n - ID: int\n - Jméno: String\n - Role: String\n - Stav: String\n + Přihlášení(): void\n + Odhlášení(): void\n}\n\nclass \"Jádro\" {\n - API rozhraní: String\n - Seznam modulů: List\n + PřijmoutPožadavek(): void\n + ValidovatUživatele(): void\n + PředatData(): void\n}\n\nclass \"Modul\" {\n - Název: String\n - Funkční rozhraní: String\n + PřijmoutPožadavek(): void\n + ZpracovatData(): void\n}\n\nclass \"Databáze\" {\n - Seznam tabulek: List\n - Spojení: String\n + NačístData(): void\n + UložitData(): void\n}\n\n\"Uživatel\" --> \"Jádro\" : Interakce\n\"Jádro\" --> \"Modul\" : Předání požadavku\n\"Modul\" --> \"Databáze\" : Dotazy na data\n@enduml"
+
+type:
+"component"
+code:
+"@startuml\npackage \"Platforma ROPIM\" {\n component \"Jádro systému\" as Jadro\n component \"Modul Plánování\" as Planovani\n component \"Modul Roadmapy\" as Roadmapy\n component \"Notifikační Modul\" as Notifikace\n component \"eAkademie\" as Akademie\n component \"eParticipace\" as Participace\n component \"Databáze\" as Databaze\n}\n\nJadro --> Planovani : Integrace\nJadro --> Roadmapy : Integrace\nJadro --> Notifikace : Komunikace\nJadro --> Akademie : Podpora vzdělávání\nJadro --> Participace : Zapojení veřejnosti\nPlanovani --> Databaze : Načítání dat\nRoadmapy --> Databaze : Načítání dat\nNotifikace --> Databaze : Ukládání upozornění\n@enduml"
+
+
+--------------------------------------
+
+Modul plánování
+
+type:
+"usecase"
+code:
+"@startuml\nactor \"Uživatel OVM\" as UživatelOVM\nactor \"Administrátor\" as Admin\nactor \"Externí API\" as API\n\nusecase \"Zobrazit dashboard OVM\" as UC1\nusecase \"Zobrazit projekt\" as UC2\nusecase \"Zobrazit konzultaci\" as UC3\nusecase \"Vložit poznatky\" as UC4\nusecase \"Zobrazit přehled konzultací\" as UC5\nusecase \"Synchronizace dat s RPP\" as UC6\nusecase \"Zobrazit centrální rozcestník\" as UC7\nusecase \"Správa přístupových práv\" as UC8\n\nUživatelOVM --> UC1\nUživatelOVM --> UC2\nUživatelOVM --> UC3\nUživatelOVM --> UC5\nUživatelOVM --> UC7\nAdmin --> UC4\nAdmin --> UC8\nAPI --> UC6\n@enduml"
+
+type:
+"class"
+code:
+"@startuml\nclass \"Modul Plánování\" {\n + zobrazitDashboardOVM(): void\n + zobrazitProjekt(projektID: int): void\n + zobrazitKonzultaci(konzultaceID: int): void\n + vložitPoznatky(data: String): void\n + zobrazitCentrálníRozcestník(): void\n}\n\nclass \"Notifikační Modul\" {\n + odeslatUpozornění(událost: String): void\n}\n\nclass \"RPP\" {\n + získatDataOAgendách(): List\n + získatDataOSlužbách(): List\n}\n\nclass \"ISDŘ\" {\n + získatDataOProjektech(): List\n}\n\n\"Modul Plánování\" --> \"Notifikační Modul\" : komunikace\n\"Modul Plánování\" --> \"RPP\" : integrace\n\"Modul Plánování\" --> \"ISDŘ\" : propojení\n@enduml"
+
+type:
+"sequence"
+code:
+"@startuml\nactor Uživatel\nparticipant \"Rozhraní Plánování\" as Rozhrani\nparticipant \"RPP\" as RPP\nparticipant \"ISDŘ\" as ISDR\nparticipant \"Notifikační Modul\" as Notifikace\n\nUživatel -> Rozhrani: Požadavek na zobrazení konzultace\nRozhrani -> ISDR: Načti data o konzultaci\nISDR -> Rozhrani: Vrátí data o konzultaci\nRozhrani -> Notifikace: Odeslat upozornění o nové konzultaci\nRozhrani -> RPP: Načti související data z RPP\nRPP -> Rozhrani: Vrátí data\nRozhrani -> Uživatel: Zobrazení konzultace\n@enduml"
+
+type:
+"component"
+code:
+"@startuml\npackage \"Modul Plánování\" {\n component \"Rozhraní Plánování\" as Rozhrani\n component \"Notifikační Modul\" as Notifikace\n component \"Správce Dat\" as SpravceDat\n component \"RPP\"\n component \"ISDŘ\"\n}\n\nRozhrani --> Notifikace : Upozornění\nRozhrani --> SpravceDat : Načítání a ukládání dat\nRozhrani --> RPP : Data o agendách a službách\nRozhrani --> ISDŘ : Data o projektech\n@enduml"
+
+type:
+"activity"
+code:
+"@startuml\nstart\n:Uživatel přistupuje k modulu Plánování;\n:Vybere zobrazení přehledu konzultací;\n:Načítání dat z ISDŘ a RPP;\nif (Data nalezena?) then (Ano)\n :Zobrazení přehledu konzultací;\nelse (Ne)\n :Zobrazení chybové zprávy;\nendif\nstop\n@enduml"
+
+---------------
+
+Feature: Kalendář
+
+type:
+"usecase"
+code:
+"@startuml\nactor Občan\nactor \"Veřejná Autorita\" as Autorita\nactor \"Externí API (např. eSbírky)\" as API\n\nusecase \"Zobrazit události kalendáře\" as UC1\nusecase \"Filtrovat události\" as UC2\nusecase \"Přijímat upozornění\" as UC3\nusecase \"Načíst data z externích zdrojů\" as UC4\nusecase \"Integrovat s jinými moduly\" as UC5\n\nObčan --> UC1\nObčan --> UC2\nObčan --> UC3\nAutorita --> UC1\nAutorita --> UC2\nAutorita --> UC3\nAutorita --> UC5\nAPI --> UC4\nAPI --> UC5\n@enduml"
+
+type:
+"activity"
+code:
+"@startuml\nstart\n:Uživatel přistupuje k rozhraní Kalendář;\nif (Zvolit akci?) then (Ano)\n fork\n :Načítání událostí z databáze nebo API;\n fork again\n :Filtrování událostí podle kritérií;\n end fork\n :Upozornění uživatelů na změny;\n :Aktualizace uživatelského rozhraní s filtrováním dat;\nelse (Ne)\n :Uživatel neprovádí žádnou akci;\nendif\n:Uživatel opouští Kalendář;\nstop\n@enduml"
+
+type:
+"sequence"
+code:
+"@startuml\nactor Uživatel\nparticipant \"Rozhraní Kalendář\" as Rozhrani\nparticipant \"Správce Dat\" as SpravceDat\nparticipant \"Notifikační Modul\" as NotifikacniModul\nparticipant \"Správce API\" as SpravceAPI\n\nUživatel -> Rozhrani: Požadavek na zobrazení událostí\nRozhrani -> SpravceDat: Načti data z databáze\nSpravceDat -> Rozhrani: Vrátí data\nalt Pokud data nejsou v databázi\n Rozhrani -> SpravceAPI: Načti data z API\n SpravceAPI -> Rozhrani: Vrátí data z API\nend\nRozhrani -> NotifikacniModul: Odešli upozornění\nNotifikacniModul -> Uživatel: Odeslané upozornění\nRozhrani -> Uživatel: Zobrazení dat uživateli\n@enduml"
+
+type:
+"class"
+code:
+"@startuml\nclass Kalendář {\n - eventID: int\n - eventType: String\n - date: Date\n - userRole: String\n + fetchEvents(): List\n + filterEvents(criteria: String): List\n + displayEvents(): void\n}\n\nclass \"Notifikační Modul\" {\n - notificationID: int\n - eventID: int\n - userID: int\n + sendNotification(userID: int, message: String): void\n}\n\nclass DataManager {\n - dataID: int\n - sourceType: String\n + fetchFromAPI(apiURL: String): List\n + storeData(data: List): void\n}\n\nKalendář \"1\" --> \"1..*\" \"Notifikační Modul\" : povinný (mandatory)\nKalendář \"1\" --> \"1\" DataManager : volitelný (optional)\n@enduml"
+
+type:
+"component"
+code:
+"@startuml\npackage \"Systém Kalendář\" {\n component \"Funkce Kalendář\" as Kalendář\n component \"Notifikační Modul\" as Notifikace\n component \"Plánovací Modul\" as Planovac\n component \"Správce API\" as API\n component \"Správce Databáze\" as Databaze\n component \"Uživatelské Rozhraní\" as Rozhrani\n \n Kalendář --> Notifikace : Odešle upozornění\n Kalendář --> Planovac : Synchronizace událostí\n Kalendář --> API : Načítání dat\n Kalendář --> Databaze : Ukládání a načítání dat\n Rozhrani --> Kalendář : Interakce uživatele\n}\n\npackage \"Externí Systémy\" {\n component \"API Manager\"\n API --> \"API Manager\" : Dotazy a odpovědi\n}\n@enduml"
+
+
+
