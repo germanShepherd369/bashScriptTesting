@@ -1,0 +1,34 @@
+.custom-footer {
+  background-color: #1c3a1c;  /* Dark green */
+}
+
+/* Arrow in top-right corner */
+.arrow-top-link {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.arrow-top-link img {
+  width: 40px;
+  transition: transform 0.3s;
+}
+.arrow-top-link img:hover {
+  transform: scale(1.1);
+}
+
+/* Logos */
+.footer-logo {
+  max-width: 200px;
+  height: auto;
+  transition: transform 0.3s;
+}
+.footer-logo:hover {
+  transform: scale(1.1);
+}
+
+/* Admin icon */
+.admin-icon {
+  width: 30px;
+  height: auto;
+}

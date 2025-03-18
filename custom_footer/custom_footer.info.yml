@@ -1,0 +1,5 @@
+name: 'Custom Footer'
+type: module
+description: 'Provides a custom footer block for ROPIM.'
+core_version_requirement: ^10 || ^11
+package: 'Custom'

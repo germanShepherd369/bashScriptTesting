@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Main module file for the Custom Footer module.
+ */
+
+/**
+ * Implements hook_theme().
+ *
+ * Declares a 'footer_block' theme hook using the Twig template footer-block.html.twig.
+ */
+function custom_footer_theme($existing, $type, $theme, $path) {
+  return [
+    'footer_block' => [
+      'variables' => [],
+      'template' => 'footer-block',
+      'path' => $path . '/templates',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for 'footer_block'.
+ *
+ * Supplies a 'directory' variable, letting Twig reference assets like:
+ *   {{ directory }}/assets/dia_logo.svg
+ */
+function custom_footer_preprocess_footer_block(array &$variables) {
+  // Use the extension.list.module service to get your module's path.
+  $module_path = \Drupal::service('extension.list.module')->getPath('custom_footer');
+  $variables['directory'] = '/' . $module_path;
+}
